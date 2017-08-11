@@ -47,22 +47,31 @@ public class BannerView extends LinearLayout {
         viewPager.setOffscreenPageLimit(banners.length);
 //        viewPager.setLayerType(ViewPager.LAYER_TYPE_SOFTWARE, null);
         viewPager.setAdapter(viewPagerAdapter);
-        //viewPager.setPageTransformer(true, new DepthPageTransformer());
-
+        viewPager.setPageTransformer(true, new DepthPageTransformer());
+        viewPager.setCurrentItem(1, true);
         ToggleButton toggleButtonIsInfinite = (ToggleButton) findViewById(R.id.toggleButtonIsInfinite);
         toggleButtonIsInfinite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isInfinite = buttonView.isChecked();
-
 //                viewPagerAdapter = new ViewPagerAdapter(context, banners, isInfinite);
 //                viewPager.setOffscreenPageLimit(1);
 //                viewPager.setAdapter(viewPagerAdapter);
 
                 viewPagerAdapter.setInfinite(isInfinite);
-                Toast.makeText(getContext(),
-                        String.valueOf(isInfinite), Toast.LENGTH_SHORT).show();
+                if (isInfinite) {
+                    viewPager.setAllowedSwipeDirection(SwipeDirection.all);
+                }
+                if (!isInfinite && currentPage==banners.length){
+                    viewPager.setAllowedSwipeDirection(SwipeDirection.left2right);
+                } else {
+                    if (!isInfinite && currentPage == 1) {
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.right2left);
+                    } else {
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.all);
+                    }
+                }
             }
         });
 
@@ -83,46 +92,62 @@ public class BannerView extends LinearLayout {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 currentPage = viewPager.getCurrentItem();
+                int pageCount = banners.length + 2;
+                int pos = 1;
+                if (currentPage == pageCount - 1){
+                    viewPager.setCurrentItem(1, false);
+                    pos = 1;
+                } else if (currentPage == 0){
+                    viewPager.setCurrentItem(pageCount - 2, false);
+                    pos = pageCount - 2;
+                } else {
+                    pos = currentPage;
+                }
 
-                int pos = currentPage % banners.length;
                 for (int i = 0; i < dotscount; i++) {
                     dots[i].setImageResource(R.drawable.nonactive_dot);
                 }
-                dots[pos].setImageResource(R.drawable.active_dot);
+                dots[pos-1].setImageResource(R.drawable.active_dot);
             }
 
             @Override
             public void onPageSelected(int position) {
                 currentPage = viewPager.getCurrentItem();
-                if (!isInfinite && currentPage==banners.length-1 || currentPage==0){
-                    viewPager.setPagingEnabled(false);
-                }else {
-                    viewPager.setPagingEnabled(true);
+                Log.d("currentPage", String.valueOf(currentPage));
+
+                if (!isInfinite && currentPage==banners.length){
+                    viewPager.setAllowedSwipeDirection(SwipeDirection.left2right);
+                } else {
+                    if (!isInfinite && currentPage == 1) {
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.right2left);
+                    } else {
+                        viewPager.setAllowedSwipeDirection(SwipeDirection.all);
+                    }
                 }
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                currentPage = viewPager.getCurrentItem();
-                if (isInfinite){
-                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
-                        int pageCount = banners.length + 2;
-
-                        if (currentPage == pageCount - 1){
-                            viewPager.setCurrentItem(1, false);
-                        } else if (currentPage == 0){
-                            viewPager.setCurrentItem(pageCount - 2,false);
-                        }
-                    }
-                }
+//                currentPage = viewPager.getCurrentItem();
+//                if (isInfinite){
+//                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+//                        int pageCount = banners.length + 2;
+//
+//                        if (currentPage == pageCount - 1){
+//                            viewPager.setCurrentItem(1, true);
+//                        } else if (currentPage == 0){
+//                            viewPager.setCurrentItem(pageCount - 2,true);
+//                        }
+//                    }
+//                }
             }
         });
 
         final Handler handler = new Handler();
         final Runnable update = new Runnable() {
             public void run() {
-                if (currentPage == viewPagerAdapter.getCount()) {
-                    currentPage = 0;
+                if (currentPage == viewPagerAdapter.getCount()-1) {
+                    currentPage = 1;
                 }
                 viewPager.setCurrentItem(currentPage++, true);
             }

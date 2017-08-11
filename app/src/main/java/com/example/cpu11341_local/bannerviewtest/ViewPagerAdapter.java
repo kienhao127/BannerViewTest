@@ -11,6 +11,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -36,10 +37,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        if (isInfinite){
             return banners.length + 2;
-        }
-        return banners.length;
     }
 
     @Override
@@ -54,12 +52,20 @@ public class ViewPagerAdapter extends PagerAdapter {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_banner_layout, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setImageResource(banners[currentPositon].getImageID());
+        if (position == 0) {
+            imageView.setImageResource(banners[banners.length-1].getImageID());
+        } else {
+            if (position == (banners.length + 1)) {
+                imageView.setImageResource(banners[0].getImageID());
+            }else{
+                imageView.setImageResource(banners[position - 1].getImageID());
+            }
+        }
 
 //        view.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                int currentPositon = position % banners.length;
+//                int currentPositon = position - 1;
 //                if (banners[currentPositon].getAction_type() == 1){
 //                    Intent intent = new Intent(context, OpenRoomActivity.class);
 //                    intent.putExtra("RoomID", banners[currentPositon].getRoomID());
