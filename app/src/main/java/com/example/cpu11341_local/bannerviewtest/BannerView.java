@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+
 public class BannerView extends LinearLayout {
     CustomViewPager viewPager;
     LinearLayout sliderDotspanel;
@@ -34,6 +35,10 @@ public class BannerView extends LinearLayout {
     ViewPagerAdapter viewPagerAdapter;
     boolean isInfinite;
     private Banner[] banners = {new Banner(R.drawable.banner1, 69), new Banner(R.drawable.banner2, "www.google.com"), new Banner(R.drawable.banner3, 96), new Banner(R.drawable.banner4, "www.facebook.com")};
+
+    public void setBanners(Banner[] banners) {
+        this.banners = banners;
+    }
 
     public BannerView(final Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -45,7 +50,6 @@ public class BannerView extends LinearLayout {
 
         viewPagerAdapter = new ViewPagerAdapter(context, banners, isInfinite);
         viewPager.setOffscreenPageLimit(banners.length);
-//        viewPager.setLayerType(ViewPager.LAYER_TYPE_SOFTWARE, null);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setPageTransformer(true, new DepthPageTransformer());
         viewPager.setCurrentItem(1, true);
@@ -55,18 +59,22 @@ public class BannerView extends LinearLayout {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isInfinite = buttonView.isChecked();
-//                viewPagerAdapter = new ViewPagerAdapter(context, banners, isInfinite);
-//                viewPager.setOffscreenPageLimit(1);
-//                viewPager.setAdapter(viewPagerAdapter);
-
                 viewPagerAdapter.setInfinite(isInfinite);
                 if (isInfinite) {
                     viewPager.setAllowedSwipeDirection(SwipeDirection.all);
+                }else {
+                    if (viewPager.getCurrentItem() == banners.length+1){
+                        viewPager.setCurrentItem(1, false);
+                    }
+                    if (viewPager.getCurrentItem() == 0){
+                        viewPager.setCurrentItem(banners.length, false);
+                    }
                 }
-                if (!isInfinite && currentPage==banners.length){
+                int position = viewPager.getCurrentItem();
+                if (!isInfinite && position==banners.length){
                     viewPager.setAllowedSwipeDirection(SwipeDirection.left2right);
                 } else {
-                    if (!isInfinite && currentPage == 1) {
+                    if (!isInfinite && position == 1) {
                         viewPager.setAllowedSwipeDirection(SwipeDirection.right2left);
                     } else {
                         viewPager.setAllowedSwipeDirection(SwipeDirection.all);
@@ -88,17 +96,15 @@ public class BannerView extends LinearLayout {
         }
         dots[0].setImageResource(R.drawable.active_dot);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new CustomViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 currentPage = viewPager.getCurrentItem();
                 int pageCount = banners.length + 2;
                 int pos = 1;
                 if (currentPage == pageCount - 1){
-                    viewPager.setCurrentItem(1, false);
                     pos = 1;
                 } else if (currentPage == 0){
-                    viewPager.setCurrentItem(pageCount - 2, false);
                     pos = pageCount - 2;
                 } else {
                     pos = currentPage;
@@ -108,17 +114,15 @@ public class BannerView extends LinearLayout {
                     dots[i].setImageResource(R.drawable.nonactive_dot);
                 }
                 dots[pos-1].setImageResource(R.drawable.active_dot);
+
             }
 
             @Override
             public void onPageSelected(int position) {
-                currentPage = viewPager.getCurrentItem();
-                Log.d("currentPage", String.valueOf(currentPage));
-
-                if (!isInfinite && currentPage==banners.length){
+                if (!isInfinite && position==banners.length){
                     viewPager.setAllowedSwipeDirection(SwipeDirection.left2right);
                 } else {
-                    if (!isInfinite && currentPage == 1) {
+                    if (!isInfinite && position == 1) {
                         viewPager.setAllowedSwipeDirection(SwipeDirection.right2left);
                     } else {
                         viewPager.setAllowedSwipeDirection(SwipeDirection.all);
@@ -128,26 +132,31 @@ public class BannerView extends LinearLayout {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-//                currentPage = viewPager.getCurrentItem();
-//                if (isInfinite){
-//                    if (state == ViewPager.SCROLL_STATE_DRAGGING) {
-//                        int pageCount = banners.length + 2;
-//
-//                        if (currentPage == pageCount - 1){
-//                            viewPager.setCurrentItem(1, true);
-//                        } else if (currentPage == 0){
-//                            viewPager.setCurrentItem(pageCount - 2,true);
-//                        }
-//                    }
-//                }
+                if (isInfinite){
+                    int pageCount = viewPagerAdapter.getCount();
+                    if (state == ViewPager.SCROLL_STATE_IDLE){
+                        if (currentPage == pageCount - 1){
+                            viewPager.setCurrentItem(1, false);
+
+                        } else if (currentPage == 0){
+                            viewPager.setCurrentItem(pageCount - 2, false);
+                        }
+                    }
+                }
             }
         });
 
+        autoScroll();
+    }
+
+    public void autoScroll(){
+        currentPage = viewPager.getCurrentItem();
         final Handler handler = new Handler();
         final Runnable update = new Runnable() {
             public void run() {
+                Log.d("Current page", String.valueOf(currentPage));
                 if (currentPage == viewPagerAdapter.getCount()-1) {
-                    currentPage = 1;
+                    viewPager.setCurrentItem(1, false);
                 }
                 viewPager.setCurrentItem(currentPage++, true);
             }
@@ -159,5 +168,6 @@ public class BannerView extends LinearLayout {
                 handler.post(update);
             }
         }, 500, 2000);
+
     }
 }
