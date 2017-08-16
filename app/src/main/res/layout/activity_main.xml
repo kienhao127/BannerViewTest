@@ -4,13 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.cpu11341_local.bannerviewtest.MainActivity">
+    tools:context="com.example.cpu11341_local.bannerviewtest.DemoActivity">
 
-    <com.example.cpu11341_local.bannerviewtest.BannerView
+    <com.example.cpu11341_local.bannerviewtest.BannerView.BannerView
         android:id="@+id/BannerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp"></com.example.cpu11341_local.bannerviewtest.BannerView>
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
