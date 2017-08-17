@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
 
-import com.example.cpu11341_local.bannerviewtest.BannerView.Banner;
-import com.example.cpu11341_local.bannerviewtest.BannerView.BannerView;
+import com.example.bannerview.Banner;
+import com.example.bannerview.BannerView;
 
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ public class DemoActivity extends Activity {
         arrBannerItems2.add(new Banner(R.drawable.banner4, "www.facebook.com"));
         arrBannerItems2.add(new Banner(R.drawable.banner2, 69));
 
-        BannerView bannerView = (BannerView) findViewById(R.id.BannerView);
+        BannerView bannerView = (BannerView) findViewById(R.id.bannerView);
         bannerView.addBannerItems(arrBannerItems);
 
         bannerView.setInfiniteSlide(true);
